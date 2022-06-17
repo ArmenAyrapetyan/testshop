@@ -1,41 +1,33 @@
 <header>
-    <div class="collapse bg-dark" id="navbarHeader">
+    <div class="navbar navbar-light bg-white shadow-sm">
         <div class="container">
-            <div class="row">
-                <div class="col-sm-8 col-md-7 py-4">
-                    <h4 class="text-white">About</h4>
-                    <p class="text-muted">Add some information about the album below, the author, or any other
-                        background context. Make it a few sentences long so folks can pick up some informative tidbits.
-                        Then, link them off to some social networking sites or contact information.</p>
-                </div>
-                <div class="col-sm-4 offset-md-1 py-4">
-                    <h4 class="text-white">Contact</h4>
-                    <ul class="list-unstyled">
-                        <li><a href="#" class="text-white">Follow on Twitter</a></li>
-                        <li><a href="#" class="text-white">Like on Facebook</a></li>
-                        <li><a href="#" class="text-white">Email me</a></li>
-                    </ul>
+            <a href="{{ route('home') }}" class="navbar-brand d-flex align-items-center">
+                <strong>Test Shop</strong>
+            </a>
+            <div class="d-flex justify-content-end align-items-center">
+                <div class="btn-group">
+                    @guest
+                    <a href="{{ route('login') }}">
+                        <button class="btn btn-outline-primary m-1" type="button">
+                            Войти
+                        </button>
+                    </a>
+                    @endguest
+                    @auth
+                    <a href="#">
+                        <button class="btn btn-outline-primary m-1" type="button">
+                            Личный кабинет
+                        </button>
+                    </a>
+                    <form action="{{ route('logout') }}" method="post">
+                        @csrf
+                        <button class="btn btn-outline-danger m-1" type="submit">
+                            Выйти
+                        </button>
+                    </form>
+                    @endauth
                 </div>
             </div>
-        </div>
-    </div>
-    <div class="navbar navbar-dark bg-dark shadow-sm">
-        <div class="container">
-            <a href="#" class="navbar-brand d-flex align-items-center">
-                <strong>USER NAME</strong>
-            </a>
-            <a href="#">
-                @csrf
-                <button class="navbar-toggler" type="button">
-                    Войти
-                </button>
-            </a>
-            <a href="#">
-                @csrf
-                <button class="navbar-toggler" type="button">
-                    Выйти
-                </button>
-            </a>
         </div>
     </div>
 </header>

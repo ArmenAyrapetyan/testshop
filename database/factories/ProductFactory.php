@@ -20,9 +20,9 @@ class ProductFactory extends Factory
         return [
             'name' => $this->faker->unique()->name(),
             'description' => $this->faker->realText(),
-            'price' => $this->faker->numberBetween(1.01, 600000.99),
+            'price' => $this->faker->numberBetween(1.01, 100000.99),
             'image' => 'img.png',
-            'type_id' => $this->faker->randomElement(ProductType::select('id')->get()),
+            'product_type_id' => $this->faker->randomElement(ProductType::select('id')->get()),
             'created_at' => now(),
             'updated_at' => now(),
         ];

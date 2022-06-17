@@ -19,7 +19,7 @@ return new class extends Migration
             $table->longText('description');
             $table->double('price', 10, 2);
             $table->string('image');
-            $table->foreignId('type_id')->constrained('product_types')->cascadeOnDelete();
+            $table->foreignId('product_type_id')->constrained('product_types')->cascadeOnDelete();
             $table->timestamps();
         });
     }
