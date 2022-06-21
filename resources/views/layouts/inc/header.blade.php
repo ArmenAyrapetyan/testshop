@@ -14,7 +14,7 @@
                     </a>
                     @endguest
                     @auth
-                    <a href="#">
+                    <a href="{{ route('profile') }}">
                         <button class="btn btn-outline-primary m-1" type="button">
                             Личный кабинет
                         </button>
