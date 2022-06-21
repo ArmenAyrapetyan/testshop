@@ -3,8 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Providers\RouteServiceProvider;
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class LoginController extends Controller
 {
@@ -13,9 +14,23 @@ class LoginController extends Controller
         return view('auth.login');
     }
 
-    public function login()
+    public function login(Request $request)
     {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+            '_token' => 'required',
+        ]);
 
+        if (Auth::guard()->attempt($request->only(['email', 'password']))) {
+            $request->session()->regenerate();
+
+            return redirect()->route('home');
+        }
+
+        return redirect()->route('login')->withErrors([
+            'email' => 'Ошибка авторизации. Логин или паоль введены неверно',
+        ]);
     }
 
     public function logout()
