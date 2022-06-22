@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\ProductType;
+use App\Models\Status;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -23,6 +24,7 @@ class ProductFactory extends Factory
             'description' => $this->faker->realText(),
             'price' => $this->faker->numberBetween(1.01, 5000.99),
             'user_id' => $this->faker->randomElement(User::select('id')->get()),
+            'status_id' => $this->faker->randomElement(Status::select('id')->get()),
             'product_type_id' => $this->faker->randomElement(ProductType::select('id')->get()),
             'created_at' => now(),
             'updated_at' => now(),

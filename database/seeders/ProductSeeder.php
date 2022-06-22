@@ -16,6 +16,9 @@ class ProductSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            StatusSeeder::class
+        ]);
         ProductType::factory(40)->create();
         Product::factory(120)->create();
     }
