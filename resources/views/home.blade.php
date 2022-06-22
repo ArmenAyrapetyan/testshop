@@ -9,7 +9,7 @@
                 @foreach($products as $product)
                 <div class="col">
                     <div class="card shadow-sm border-top rounded-top">
-                        <img class="card-img" src="{{asset(('storage/images/' . $product->image))}}" alt="product"/>
+                        <img class="card-img" src="{{asset(('storage/images/' . $product->image->first()->path))}}" alt="product"/>
 
                         <div class="card-body border-end border-bottom border-start border-primary rounded-bottom">
                             <p class="card-text">{{ $product->type->name }}</p>
@@ -19,7 +19,7 @@
                             <div class="d-flex justify-content-end align-items-center">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-outline-primary">Подробнее</button>
-                                    <button type="button" class="btn btn-sm btn-outline-primary">Добавить в корзину
+                                    <button type="button" class="btn btn-sm btn-outline-primary">Связаться с продавцом
                                     </button>
                                 </div>
                             </div>
