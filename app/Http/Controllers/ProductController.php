@@ -8,6 +8,7 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -70,10 +71,14 @@ class ProductController extends Controller
         }
 
         if ($product) {
-            return redirect()->route('profile');
+            return redirect()->route('profile')->with([
+                'success' => 'Продукт созадан',
+            ]);
         }
 
-        return redirect()->route('product.create');
+        return redirect()->route('product.create')->withErrors([
+            'error' => 'Ошибка создания продукта, попробуйте позже',
+        ]);
     }
 
     /**
@@ -115,11 +120,19 @@ class ProductController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Product  $product
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        //
+        $images = Image::all()->where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class);
+        foreach ($images as $image){
+            $image->delete();
+        }
+        $product->delete();
+
+        return redirect()->route('profile')->with([
+            'success' => 'Продукт удален',
+        ]);
     }
 }

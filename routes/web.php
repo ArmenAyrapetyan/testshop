@@ -35,6 +35,7 @@ Route::prefix('crud')->group(function () {
     Route::get('product/edit/{id}', [ProductController::class, 'edit'])->middleware('auth')->name('product.edit');
     Route::get('product/create', [ProductController::class, 'create'])->middleware('auth')->name('product.create');
     Route::post('product/store', [ProductController::class, 'store'])->middleware('auth')->name('product.store');
+    Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->middleware('auth')->name('product.destroy');
 
 });
 
