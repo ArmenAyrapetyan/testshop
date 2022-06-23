@@ -22,7 +22,7 @@ class ImageSeeder extends Seeder
 
         for ($i = 1; $i < Product::all()->count()+1; $i++) {
             $imageable[] = [
-              'path' => 'img.png',
+              'path' => 'storage/images/img.png',
               'imageable_id' => $i,
               'imageable_type' => Product::class,
             ];
@@ -30,7 +30,7 @@ class ImageSeeder extends Seeder
 
         for ($i = 1; $i < User::all()->count()+1; $i++) {
             $imageable[] = [
-              'path' => 'img.png',
+              'path' => 'storage/images/imguser.png',
               'imageable_id' => $i,
               'imageable_type' => User::class,
             ];

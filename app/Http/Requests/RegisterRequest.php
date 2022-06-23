@@ -29,6 +29,7 @@ class RegisterRequest extends FormRequest
             'phone' => 'required|min:11|unique:users,phone',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
+            'avatar' => 'required|max:10000|mimes:jpg,jpeg,png,bmp,tiff',
         ];
     }
 
@@ -40,6 +41,7 @@ class RegisterRequest extends FormRequest
             'first_name' => 'фамилия',
             'last_name' => 'имя',
             'phone' => 'номер телефона',
+            'avatar' => 'изображение профиля',
         ];
     }
 
@@ -59,6 +61,9 @@ class RegisterRequest extends FormRequest
             'email.unique' => 'Пользователь с такой почтой уже существует',
 
             'password.confirmed' => 'Пароли не совпадают',
+
+            'avatar.max' => 'Максимальный размер изображения 10 мегабит',
+            'avatar.mimes' => 'Разрешеные расшерения:jpg,jpeg,png,bmp,tiff',
         ];
     }
 }

@@ -6,5 +6,3 @@
         <p class="mb-1">Выполнение тестового задания для вступления в команду back-end разработчиков</p>
     </div>
 </footer>
-
-<script src="../assets/dist/js/bootstrap.bundle.min.js"></script>

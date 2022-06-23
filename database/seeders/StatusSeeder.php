@@ -19,14 +19,14 @@ class StatusSeeder extends Seeder
 
         $nameStatus = ['Продан', 'Скрыт', 'Продается'];
 
-        for ($i = 0; $i < 2; $i++){
-            $roles[] = [
+        for ($i = 0; $i < 3; $i++){
+            $statuses[] = [
                 'name' => $nameStatus[$i],
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         }
 
-        DB::table('statuses')->insert($roles);
+        DB::table('statuses')->insert($statuses);
     }
 }
