@@ -26,15 +26,25 @@
                             <ul class="list-group list-group-flush rounded-3">
                                 <li class="list-group-item d-flex justify-content-start align-items-center p-3">
                                     <i class="fas fa-globe fa-lg text-warning"></i>
-                                    <p class="mb-0">Чаты</p>
+                                    <p class="mb-0 mx-auto">Другие товары продавца</p>
                                 </li>
 
-                                @for($i = 1; $i < 10; $i++)
-                                    <li class="list-group-item d-flex justify-content-start align-items-center p-3">
-                                        <p class="col-sm-8">Чат {{ $i }}</p>
-                                        <button class="btn btn-outline-primary col-sm-4">Открыть</button>
-                                    </li>
-                                @endfor
+                                @foreach($product->userid->products as $userProduct)
+                                    @if($userProduct->id != $product->id)
+                                        <li class="list-group-item d-flex justify-content-start align-items-center p-3">
+                                            <div class="col-sm-6">
+                                                <img class="w-75" alt="Изображение товара"
+                                                     src="{{ asset($userProduct->image->first()->path) }}">
+                                            </div>
+                                            <div class="col-sm-6 align-items-center">
+                                                <p>{{ $userProduct->name }}</p>
+                                                <a href="{{ route('product.show', $userProduct->id) }}">
+                                                    <button class="btn btn-outline-primary mx-auto">Открыть</button>
+                                                </a>
+                                            </div>
+                                        </li>
+                                    @endif
+                                @endforeach
 
                             </ul>
                         </div>
@@ -49,10 +59,9 @@
                         <div class="card-body">
 
                             @foreach($product->image as $image)
-                            <div class="row w-50">
-                                <img src="{{ asset($image->path) }}" class="card-img" alt="product_image">
-                            </div>
-                            <hr>
+                                <div class="row w-50 mx-auto">
+                                    <img src="{{ asset($image->path) }}" class="card-img" alt="product_image">
+                                </div>
                             @endforeach
 
                             <div class="row">
@@ -85,8 +94,17 @@
                             </div>
                             <hr>
 
+                            <div class="row">
+                                <div class="col-sm-3">
+                                    <p class="mb-0">Цена:</p>
+                                </div>
+                                <div class="col-sm-9">
+                                    <p class="text-muted mb-0">{{ $product->price }} <small
+                                            class="text-muted">/₽</small></p>
+                                </div>
+                            </div>
+                            <hr>
                         </div>
-
                     </div>
 
                     <div class="card mb-4">
@@ -101,20 +119,17 @@
                             <hr>
 
                             @for($i=0; $i < 10; $i++)
-                            <div class="row m-2 p-1">
-                                <div class="col-sm-3">
-                                    <p class="mb-0">Пользователь</p>
+                                <div class="row m-2 p-1">
+                                    <div class="col-sm-3">
+                                        <p class="mb-0">Пользователь</p>
+                                    </div>
+                                    <div class="col-sm-9">
+                                        <p class="text-muted mb-0">Комментарий</p>
+                                    </div>
                                 </div>
-                                <div class="col-sm-9">
-                                    <p class="text-muted mb-0">Комментарий</p>
-                                </div>
-                            </div>
                             @endfor
-
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>

@@ -56,8 +56,8 @@
                                     @endif
 
                                     @if(session('success'))
-                                        <div class="flex-grow-1 align-items-center alert-warning">
-                                            <p class="d-flex justify-content-start align-items-center text-warning ms-2 fs-4">
+                                        <div class="flex-grow-1 align-items-center alert-success">
+                                            <p class="d-flex justify-content-start align-items-center text-success ms-2 fs-4">
                                                 {{ session('success') }}</p>
                                         </div>
                                     @endif
@@ -93,17 +93,26 @@
                                     <div class="col-sm-3 mt-3">
                                         <ul class="list-group list-group-flush">
                                             <li class="d-flex justify-content-end align-items-center p-1">
-                                                {{--<button class="btn btn-outline-primary">Подробнее</button>--}}
+                                                <a href="{{ route('product.edit.image', $product) }}">
+                                                    <button class="btn btn-outline-primary">Редактор изображений</button>
+                                                </a>
                                             </li>
                                             <li class="d-flex justify-content-end align-items-center p-1">
-                                                <form action="{{ route('product.destroy', $product) }}" method="post">
+                                                <a href="{{ route('product.edit', $product) }}">
+                                                    <button class="btn btn-outline-primary">Изменить</button>
+                                                </a>
+                                            </li>
+                                            <li class="d-flex justify-content-end align-items-center p-1">
+                                                <a href="{{ route('product.show', $product->id) }}">
+                                                    <button class="btn btn-outline-primary">Открыть</button>
+                                                </a>
+                                            </li>
+                                            <li class="d-flex justify-content-end align-items-center p-1">
+                                                <form class="m-0" action="{{ route('product.destroy', $product) }}" method="post">
                                                     @method('DELETE')
                                                     @csrf
                                                     <button class="btn btn-outline-danger">Удалить</button>
                                                 </form>
-                                            </li>
-                                            <li class="d-flex justify-content-end align-items-center p-1">
-                                                <button class="btn btn-outline-primary">Изменить</button>
                                             </li>
                                         </ul>
                                     </div>

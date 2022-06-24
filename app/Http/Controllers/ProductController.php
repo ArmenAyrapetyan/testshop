@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\EditProductRequest;
 use App\Http\Requests\ProductRequest;
 use App\Models\Image;
 use App\Models\Product;
@@ -99,22 +100,51 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Contracts\View\View
      */
-    public function edit($id)
+    public function edit(Product $product)
     {
-        $product = Product::where('id', '=', $id)->get();
-        return view('crud.product.edit', compact('product'));
+        $productTypes = ProductType::all();
+        return view('crud.product.edit', compact('product', 'productTypes'));
     }
 
     /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param  Product  $product
+     * @return \Illuminate\Routing\Redirector
      */
-    public function update(Request $request, $id)
+    public function update(EditProductRequest $request, Product $product)
     {
-        //Редактирование
+        $product->update([
+            'name' => $request['name'],
+            'description' => $request['description'],
+            'price' => $request['price'],
+            'user_id' => $request->user()->id,
+            'product_type_id' => $request['product_type_id'],
+        ]);
+
+        if ($request->file('images')){
+            $files = $request->file('images');
+
+            foreach ($files as $file) {
+                $upload_folder = "public/images/" . date('Y-m-d');
+                $name = $file->getClientOriginalName();
+                $name = strstr($name, '.', true);
+                $extension = $file->getClientOriginalExtension();
+                $name = $name . date('Y-m-d') . '.' . $extension;
+                $path = Storage::putFileAs($upload_folder, $file, $name);
+
+                $path = str_replace('public', 'storage', $path);
+
+                Image::create([
+                    'path' => $path,
+                    'imageable_type' => Product::class,
+                    'imageable_id' => $product->id,
+                ]);
+            }
+        }
+
+        return redirect(route('profile'))->with('success', 'Продукт изменен');
     }
 
     /**
@@ -133,6 +163,20 @@ class ProductController extends Controller
 
         return redirect()->route('profile')->with([
             'success' => 'Продукт удален',
+        ]);
+    }
+
+    public function showImageForm(Product $product)
+    {
+        return view('crud.product.image', compact('product'));
+    }
+
+    public function imageDestroy(Image $image)
+    {
+        $product = Product::where('id', '=' ,$image->imagable_id)->first();
+        $image->delete();
+        return redirect()->back()->with([
+           'success' => 'Изображение удалено',
         ]);
     }
 }

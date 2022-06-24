@@ -28,14 +28,18 @@ Route::get('/profile', [ProfileController::class, 'showProfileview'])->middlewar
 
 //CRUD
 Route::prefix('crud')->group(function () {
-
     //Продукты
     Route::get('product/show/{id}', [ProductController::class, 'show'])->name('product.show');
-
-    Route::get('product/edit/{id}', [ProductController::class, 'edit'])->middleware('auth')->name('product.edit');
+    //Редактирование
+    Route::get('product/edit/{product}', [ProductController::class, 'edit'])->middleware('auth')->name('product.edit');
+    Route::put('product/update/{product}', [ProductController::class, 'update'])->middleware('auth')->name('product.update');
+    //Создание
     Route::get('product/create', [ProductController::class, 'create'])->middleware('auth')->name('product.create');
     Route::post('product/store', [ProductController::class, 'store'])->middleware('auth')->name('product.store');
+    //Удаление
     Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->middleware('auth')->name('product.destroy');
-
+    //Изображения
+    Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->middleware('auth')->name('product.edit.image');
+    Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->middleware('auth')->name('product.image.destroy');
 });
 

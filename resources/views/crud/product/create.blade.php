@@ -65,7 +65,7 @@
                                 <div class="col-md-6">
                                     <select class="form-select" name="product_type_id">
                                         @foreach($productTypes as $type)
-                                        <option value="{{ $type->id }}">{{ $type->name }}</option>
+                                        <option value="{{ $type->id }} {{ old('product_type_id') == $type->id ? 'selected' : '' }}">{{ $type->name }}</option>
                                         @endforeach
                                     </select>
 
