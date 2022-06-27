@@ -16,7 +16,9 @@
                             <p class="text-muted mb-1">{{ $userInfo->email }}</p>
                             <p class="text-muted mb-4">{{ $userInfo->phone }}</p>
                             <div class="d-flex justify-content-center mb-2">
-                                <button type="button" class="btn btn-primary">Изменить профиль</button>
+                                <a href="{{ route('user.edit', $userInfo) }}">
+                                    <button type="button" class="btn btn-primary">Изменить профиль</button>
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -102,6 +104,20 @@
                                                     <button class="btn btn-outline-primary">Изменить</button>
                                                 </a>
                                             </li>
+                                            @if($product->status->name == "Продан")
+                                                <li class="d-flex justify-content-end align-items-center p-1">
+                                                    <a href="{{ route('product.forsale', $product) }}">
+                                                        <button class="btn btn-outline-primary">Продается</button>
+                                                    </a>
+                                                </li>
+                                            @endif
+                                            @if($product->status->name == "Продается")
+                                                <li class="d-flex justify-content-end align-items-center p-1">
+                                                    <a href="{{ route('product.sold', $product) }}">
+                                                        <button class="btn btn-outline-primary">Продан</button>
+                                                    </a>
+                                                </li>
+                                            @endif
                                             <li class="d-flex justify-content-end align-items-center p-1">
                                                 <a href="{{ route('product.show', $product->id) }}">
                                                     <button class="btn btn-outline-primary">Открыть</button>

@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -27,10 +28,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/profile', [ProfileController::class, 'showProfileview'])->middleware(['auth', 'verified'])->name('profile');
 
 //CRUD
-Route::prefix('crud')->as('product.')->group(function () {
+Route::prefix('crud')->group(function () {
+
     //Продукты
-    Route::get('product/show/{id}', [ProductController::class, 'show'])->name('show');
-    Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('product/show/{id}', [ProductController::class, 'show'])->name('product.show');
+
+    Route::middleware(['auth', 'verified'])->as('product.')->group(function () {
         //Редактирование
         Route::get('product/edit/{product}', [ProductController::class, 'edit'])->name('edit');
         Route::put('product/update/{product}', [ProductController::class, 'update'])->name('update');
@@ -39,9 +42,19 @@ Route::prefix('crud')->as('product.')->group(function () {
         Route::post('product/store', [ProductController::class, 'store'])->name('store');
         //Удаление
         Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        //Статусы
+        Route::get('product/sold/{product}', [ProductController::class, 'soldProduct'])->name('sold');
+        Route::get('product/forsale/{product}', [ProductController::class, 'forSaleProduct'])->name('forsale');
         //Изображения
         Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->name('edit.image');
         Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->name('image.destroy');
+    });
+
+    //Пользователи
+    Route::middleware(['auth', 'verified'])->as('user.')->group(function () {
+        //Изменение
+        Route::get('user/edit/{user}', [UserController::class, 'edit'])->name('edit');
+        Route::post('user/update/{user}', [UserController::class, 'update'])->name('update');
     });
 });
 

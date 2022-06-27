@@ -13,7 +13,7 @@
 
                             <div class="row mb-3">
                                 <label for="email"
-                                       class="col-md-4 col-form-label text-md-end">Введите почту:</label>
+                                       class="col-md-4 col-form-label text-md-end">{{ __('Введите почту:')}}</label>
 
                                 <div class="col-md-6">
                                     <input type="email" class="form-control @error('email') is-invalid @enderror"
@@ -46,7 +46,7 @@
                             <div class="row mb-0">
                                 <div class="col-md-8 offset-md-4">
                                     <button type="submit" class="btn btn-primary">
-                                        Войти
+                                        {{ __('Войти') }}
                                     </button>
 
                                     @if (Route::has('password.request'))

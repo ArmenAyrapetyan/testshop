@@ -4,6 +4,7 @@ namespace App\Providers;
 
 
 use Carbon\Carbon;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
@@ -28,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        //Верификация mail
         VerifyEmail::toMailUsing(function ($notifiable) {
 
             // Генерация ссылки для подтверждения письма

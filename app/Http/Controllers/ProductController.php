@@ -185,4 +185,26 @@ class ProductController extends Controller
            'error' => 'У продукта должно быть хотя бы 1 изображение',
         ]);
     }
+
+    public function soldProduct(Product $product)
+    {
+        $product->update([
+            'status_id' => Status::select('id')->where('name', '=', 'Продан')->first()->id,
+        ]);
+
+        return redirect()->route('profile')->with([
+            'success' => 'Продукт отмечен проданым',
+        ]);
+    }
+
+    public function forSaleProduct(Product $product)
+    {
+        $product->update([
+            'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
+        ]);
+
+        return redirect()->route('profile')->with([
+            'success' => 'Продукт продается вновь',
+        ]);
+    }
 }
