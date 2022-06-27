@@ -173,10 +173,16 @@ class ProductController extends Controller
 
     public function imageDestroy(Image $image)
     {
-        $product = Product::where('id', '=' ,$image->imagable_id)->first();
-        $image->delete();
-        return redirect()->back()->with([
-           'success' => 'Изображение удалено',
+        $product = Product::where('id', '=' ,$image->imageable_id)->first();
+        $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
+        if($countImages > 1){
+            $image->delete();
+            return redirect()->back()->with([
+                'success' => 'Изображение удалено',
+            ]);
+        }
+        return redirect()->back()->withErrors([
+           'error' => 'У продукта должно быть хотя бы 1 изображение',
         ]);
     }
 }

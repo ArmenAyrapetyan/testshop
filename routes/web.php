@@ -18,28 +18,30 @@ use Illuminate\Support\Facades\Route;
 */
 
 //Авторизация и регистрация
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 //Главная страница
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-//Профиль
-Route::get('/profile', [ProfileController::class, 'showProfileview'])->middleware('auth')->name('profile');
+//Профиль verified
+Route::get('/profile', [ProfileController::class, 'showProfileview'])->middleware(['auth', 'verified'])->name('profile');
 
 //CRUD
-Route::prefix('crud')->group(function () {
+Route::prefix('crud')->as('product.')->group(function () {
     //Продукты
-    Route::get('product/show/{id}', [ProductController::class, 'show'])->name('product.show');
-    //Редактирование
-    Route::get('product/edit/{product}', [ProductController::class, 'edit'])->middleware('auth')->name('product.edit');
-    Route::put('product/update/{product}', [ProductController::class, 'update'])->middleware('auth')->name('product.update');
-    //Создание
-    Route::get('product/create', [ProductController::class, 'create'])->middleware('auth')->name('product.create');
-    Route::post('product/store', [ProductController::class, 'store'])->middleware('auth')->name('product.store');
-    //Удаление
-    Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->middleware('auth')->name('product.destroy');
-    //Изображения
-    Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->middleware('auth')->name('product.edit.image');
-    Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->middleware('auth')->name('product.image.destroy');
+    Route::get('product/show/{id}', [ProductController::class, 'show'])->name('show');
+    Route::middleware(['auth', 'verified'])->group(function () {
+        //Редактирование
+        Route::get('product/edit/{product}', [ProductController::class, 'edit'])->name('edit');
+        Route::put('product/update/{product}', [ProductController::class, 'update'])->name('update');
+        //Создание
+        Route::get('product/create', [ProductController::class, 'create'])->name('create');
+        Route::post('product/store', [ProductController::class, 'store'])->name('store');
+        //Удаление
+        Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->name('destroy');
+        //Изображения
+        Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->name('edit.image');
+        Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->name('image.destroy');
+    });
 });
 

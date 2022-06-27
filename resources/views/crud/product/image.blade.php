@@ -48,17 +48,24 @@
 
                                 <div
                                     class="d-flex justify-content-end align-items-center p-1 border border-primary rounded">
-                                    <div class="flex-grow-1 align-items-center">
-                                        <p class="d-flex justify-content-start align-items-center ms-2 fs-5">
-                                            Редактирование изображений продукта {{ $product->name }}</p>
-                                    </div>
 
                                     @if(session('success'))
                                         <div class="flex-grow-1 align-items-center alert-success">
                                             <p class="d-flex justify-content-start align-items-center text-success ms-2 fs-4">
                                                 {{ session('success') }}</p>
                                         </div>
+                                    @else
+                                        <div class="flex-grow-1 align-items-center">
+                                            <p class="d-flex justify-content-start align-items-center ms-2 fs-5">
+                                                Редактирование изображений продукта {{ $product->name }}</p>
+                                        </div>
                                     @endif
+                                    @error('error')
+                                    <div class="flex-grow-1 align-items-center alert-danger">
+                                        <p class="d-flex justify-content-start align-items-center text-danger ms-2 fs-4">
+                                            {{ session('success') }}</p>
+                                    </div>
+                                    @enderror
                                 </div>
 
                                 @foreach($product->image as $image)

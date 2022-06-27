@@ -38,8 +38,10 @@ class RegisterController extends Controller
             'phone' => $request['phone'],
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
-//            'remember_token' => $request[''],
+//            'remember_token' => '',
         ]);
+
+
 
         $image = Image::create([
             'path' => $path,
@@ -49,7 +51,8 @@ class RegisterController extends Controller
 
         if ($user && $image) {
             auth()->login($user);
-            return redirect()->route('home');
+            $user->sendEmailVerificationNotification();
+            return redirect()->route('verification.notice');
         }
 
         return redirect()->route('register');
