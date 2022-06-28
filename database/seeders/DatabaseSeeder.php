@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Review;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -17,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ProductSeeder::class,
             OrderSeeder::class,
+            ReviewSeeder::class,
             ImageSeeder::class,
         ]);
     }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Image;
 use App\Models\Product;
+use App\Models\Review;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -33,6 +34,14 @@ class ImageSeeder extends Seeder
               'path' => 'storage/images/imguser.png',
               'imageable_id' => $i,
               'imageable_type' => User::class,
+            ];
+        }
+
+        for ($i = 1; $i < Review::all()->count()+1; $i++) {
+            $imageable[] = [
+                'path' => 'storage/images/review.jpg',
+                'imageable_id' => $i,
+                'imageable_type' => Review::class,
             ];
         }
 

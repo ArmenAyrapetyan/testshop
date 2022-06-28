@@ -118,16 +118,38 @@
                             </div>
                             <hr>
 
-                            @for($i=0; $i < 10; $i++)
+                            @if($product->reviews->count() > 0)
+                                @foreach($product->reviews as $review)
+                                    <div class="row w-50">
+                                        @foreach($review->images as $image)
+                                            <div class="col">
+                                                <img class="img-fluid" src="{{ asset($image->path) }}" alt="reviewImage">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    <div class="row m-2 p-1">
+                                        <div class="col-sm-3">
+                                            <p class="mb-0">{{ $review->user->last_name . ' ' . $review->user->first_name  }}</p>
+                                        </div>
+                                        <div class="col-sm-9">
+                                            <p class="text-muted mb-0">{{ $review->text }}</p>
+                                        </div>
+                                    </div>
+                                    <hr>
+                                @endforeach
+                            @else
                                 <div class="row m-2 p-1">
-                                    <div class="col-sm-3">
-                                        <p class="mb-0">Пользователь</p>
-                                    </div>
-                                    <div class="col-sm-9">
-                                        <p class="text-muted mb-0">Комментарий</p>
-                                    </div>
+                                    <p class="mb-0">Комментариев нет</p>
                                 </div>
-                            @endfor
+                            @endif
+
+                            <div
+                                class="d-flex justify-content-end align-items-center p-1">
+                                <a class="d-flex justify-content-end align-items-center p-1"
+                                   href="{{ route('review.create', $product->id) }}">
+                                    <button class="btn btn-outline-primary">Написать комментарий</button>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>

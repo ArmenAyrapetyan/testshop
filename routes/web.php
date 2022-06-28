@@ -3,6 +3,7 @@
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,7 @@ Route::prefix('crud')->group(function () {
         //Статусы
         Route::get('product/sold/{product}', [ProductController::class, 'soldProduct'])->name('sold');
         Route::get('product/forsale/{product}', [ProductController::class, 'forSaleProduct'])->name('forsale');
+        Route::get('product/close/{product}', [ProductController::class, 'closeProduct'])->name('close');
         //Изображения
         Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->name('edit.image');
         Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->name('image.destroy');
@@ -55,6 +57,13 @@ Route::prefix('crud')->group(function () {
         //Изменение
         Route::get('user/edit/{user}', [UserController::class, 'edit'])->name('edit');
         Route::post('user/update/{user}', [UserController::class, 'update'])->name('update');
+    });
+
+    //Комментарии
+    Route::middleware(['auth', 'verified'])->as('review.')->group(function () {
+        //Создание
+        Route::get('review/create/{id}', [ReviewController::class, 'create'])->name('create');
+        Route::post('review/store', [ReviewController::class, 'store'])->name('store');
     });
 });
 

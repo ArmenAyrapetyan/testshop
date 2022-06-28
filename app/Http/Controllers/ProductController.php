@@ -7,6 +7,7 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Review;
 use App\Models\Status;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -205,6 +206,17 @@ class ProductController extends Controller
 
         return redirect()->route('profile')->with([
             'success' => 'Продукт продается вновь',
+        ]);
+    }
+
+    public function closeProduct(Product $product)
+    {
+        $product->update([
+            'status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id,
+        ]);
+
+        return redirect()->route('profile')->with([
+            'success' => 'Продукт скрыт',
         ]);
     }
 }
