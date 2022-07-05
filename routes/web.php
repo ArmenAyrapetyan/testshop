@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductTypeController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\UserController;
@@ -35,18 +37,22 @@ Route::prefix('crud')->group(function () {
     Route::get('product/show/{id}', [ProductController::class, 'show'])->name('product.show');
 
     Route::middleware(['auth', 'verified'])->as('product.')->group(function () {
-        //Редактирование
-        Route::get('product/edit/{product}', [ProductController::class, 'edit'])->name('edit');
-        Route::put('product/update/{product}', [ProductController::class, 'update'])->name('update');
         //Создание
         Route::get('product/create', [ProductController::class, 'create'])->name('create');
         Route::post('product/store', [ProductController::class, 'store'])->name('store');
+
+        //Редактирование
+        Route::get('product/edit/{product}', [ProductController::class, 'edit'])->name('edit');
+        Route::put('product/update/{product}', [ProductController::class, 'update'])->name('update');
         //Удаление
         Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->name('destroy');
         //Статусы
         Route::get('product/sold/{product}', [ProductController::class, 'soldProduct'])->name('sold');
-        Route::get('product/forsale/{product}', [ProductController::class, 'forSaleProduct'])->name('forsale');
+        Route::get('product/for_sale/{product}', [ProductController::class, 'forSaleProduct'])->name('forsale');
         Route::get('product/close/{product}', [ProductController::class, 'closeProduct'])->name('close');
+        //Уведомления
+        Route::get('notify/{id}/{product}', [NotificationController::class, 'sendAdminNotification'])->name('notify');
+
         //Изображения
         Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->name('edit.image');
         Route::delete('product/destroy/image/{image}', [ProductController::class, 'imageDestroy'])->name('image.destroy');
@@ -57,13 +63,24 @@ Route::prefix('crud')->group(function () {
         //Изменение
         Route::get('user/edit/{user}', [UserController::class, 'edit'])->name('edit');
         Route::post('user/update/{user}', [UserController::class, 'update'])->name('update');
+        //Бан
+        Route::get('user/block/{id}', [UserController::class, 'blockUser'])->name('block');
     });
 
     //Комментарии
     Route::middleware(['auth', 'verified'])->as('review.')->group(function () {
-        //Создание
+        //Создание комментария
         Route::get('review/create/{id}', [ReviewController::class, 'create'])->name('create');
         Route::post('review/store', [ReviewController::class, 'store'])->name('store');
+        //Создание жалобы
+        Route::get('claim/{id}', [ReviewController::class, 'createClaim'])->name('claimcreate');
+        Route::post('claim/claimStore', [ReviewController::class, 'claimStore'])->name('claimstore');
+    });
+
+    //Типы продуктов
+    Route::middleware(['auth', 'verified'])->as('type.')->group(function () {
+        Route::get('type/create', [ProductTypeController::class, 'create'])->name('create');
+        Route::post('type/store', [ProductTypeController::class, 'store'])->name('store');
     });
 });
 

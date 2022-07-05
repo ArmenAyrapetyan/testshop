@@ -43,4 +43,9 @@ class Product extends Model
     {
         return $this->hasMany(Review::class, 'product_id','id');
     }
+
+    public function countClaim($id)
+    {
+        return Review::where('is_claim', '=', 1)->where('product_id', '=', $id)->count();
+    }
 }

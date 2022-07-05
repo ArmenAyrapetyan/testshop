@@ -20,6 +20,13 @@
                         </div>
                     @endif
 
+                    @error('error')
+                        <div class="flex-grow-1 align-items-center alert-danger">
+                            <p class="d-flex justify-content-start align-items-center text-danger ms-2 fs-4">
+                                {{ $message }}</p>
+                        </div>
+                    @enderror
+
                     <a class="d-flex justify-content-end align-items-center p-1"
                        href="{{ route('product.create') }}">
                         <button class="btn btn-outline-primary">Создать объявление</button>
@@ -50,27 +57,36 @@
 
                     <div class="col-sm-3 mt-3">
                         <ul class="list-group list-group-flush">
-                            <li class="d-flex justify-content-end align-items-center p-1">
-                                <a href="{{ route('product.edit.image', $product) }}">
-                                    <button class="btn btn-outline-primary">Редактор изображений</button>
-                                </a>
-                            </li>
-                            <li class="d-flex justify-content-end align-items-center p-1">
-                                <a href="{{ route('product.edit', $product) }}">
-                                    <button class="btn btn-outline-primary">Изменить</button>
-                                </a>
-                            </li>
-                            @if($product->status->name == "Продан")
+                            @if($product->status_id != 4)
+                                <li class="d-flex justify-content-end align-items-center p-1">
+                                    <a href="{{ route('product.edit.image', $product) }}">
+                                        <button class="btn btn-outline-primary">Редактор изображений</button>
+                                    </a>
+                                </li>
+                                <li class="d-flex justify-content-end align-items-center p-1">
+                                    <a href="{{ route('product.edit', $product) }}">
+                                        <button class="btn btn-outline-primary">Изменить</button>
+                                    </a>
+                                </li>
+                            @endif
+                            @if($product->status_id == 1)
                                 <li class="d-flex justify-content-end align-items-center p-1">
                                     <a href="{{ route('product.forsale', $product) }}">
                                         <button class="btn btn-outline-primary">Продается</button>
                                     </a>
                                 </li>
                             @endif
-                            @if($product->status->name == "Продается")
+                            @if($product->status_id == 3)
                                 <li class="d-flex justify-content-end align-items-center p-1">
                                     <a href="{{ route('product.sold', $product) }}">
                                         <button class="btn btn-outline-primary">Продан</button>
+                                    </a>
+                                </li>
+                            @endif
+                            @if($product->status_id == 2)
+                                <li class="d-flex justify-content-end align-items-center p-1">
+                                    <a href="{{ route('product.notify', [1, $product]) }}">
+                                        <button class="btn btn-outline-primary">Исправлен</button>
                                     </a>
                                 </li>
                             @endif

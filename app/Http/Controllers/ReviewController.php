@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ReviewRequest;
 use App\Models\Image;
-use App\Models\Product;
 use App\Models\Review;
 use Illuminate\Support\Facades\Storage;
 
@@ -23,10 +22,10 @@ class ReviewController extends Controller
             'product_id' => $request['product_id'],
         ]);
 
-        if ($request->hasFile('images')){
+        if ($request->hasFile('images')) {
             $files = $request->file('images');
 
-            foreach ($files as $file){
+            foreach ($files as $file) {
                 $upload_folder = "public/images/" . date('Y-m-d');
                 $name = $file->getClientOriginalName();
                 $name = strstr($name, '.', true);
@@ -43,5 +42,35 @@ class ReviewController extends Controller
                 ]);
             }
         }
+        return back()->with([
+            'success' => 'Комментарий оставлен'
+        ]);
+    }
+
+    public function createClaim($id)
+    {
+        return view('crud.review.claim', compact('id'));
+    }
+
+    public function claimStore(ReviewRequest $request)
+    {
+        if (Review::where('user_id', '=', $request->user()->id)
+                ->where('product_id', '=', $request['product_id'])
+                ->where('is_claim', '=', '1')
+                ->count() == 0) {
+            Review::create([
+                'text' => $request['text'],
+                'user_id' => $request->user()->id,
+                'product_id' => $request['product_id'],
+                'is_claim' => 1,
+            ]);
+
+            return back()->with([
+                'success' => 'Жалоба отправлена'
+            ]);
+        }
+        return back()->with([
+            'success' => 'Вы уже жаловались на этот продукт'
+        ]);
     }
 }

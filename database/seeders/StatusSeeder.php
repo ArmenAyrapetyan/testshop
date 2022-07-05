@@ -17,9 +17,9 @@ class StatusSeeder extends Seeder
     {
         $statuses = [];
 
-        $nameStatus = ['Продан', 'Скрыт', 'Продается'];
+        $nameStatus = ['Продан', 'Скрыт', 'Продается', 'На рассмотрении'];
 
-        for ($i = 0; $i < 3; $i++){
+        for ($i = 0; $i < 4; $i++) {
             $statuses[] = [
                 'name' => $nameStatus[$i],
                 'created_at' => now(),

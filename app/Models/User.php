@@ -23,7 +23,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_name',
         'phone',
         'email',
-        'role_id' => 2,
+        'role_id',
         'password',
     ];
 

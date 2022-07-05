@@ -58,14 +58,12 @@
                                         <div class="flex-grow-1 align-items-center">
                                             <p class="d-flex justify-content-start align-items-center ms-2 fs-5">
                                                 Редактирование изображений продукта {{ $product->name }}</p>
+                                            @error('error')
+                                            <p class="d-flex justify-content-start align-items-center text-danger ms-2 fs-6">
+                                                {{ $message }}</p>
+                                            @enderror
                                         </div>
                                     @endif
-                                    @error('error')
-                                    <div class="flex-grow-1 align-items-center alert-danger">
-                                        <p class="d-flex justify-content-start align-items-center text-danger ms-2 fs-4">
-                                            {{ session('success') }}</p>
-                                    </div>
-                                    @enderror
                                 </div>
 
                                 @foreach($product->image as $image)

@@ -10,6 +10,7 @@ use App\Models\ProductType;
 use App\Models\Review;
 use App\Models\Status;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,13 +26,14 @@ class ProductController extends Controller
         //
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Contracts\View\View
-     */
     public function create()
     {
+        if (auth()->user()->cannot('create')){
+            return redirect()->route('profile')->withErrors([
+               'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $productTypes = ProductType::all();
         return view('crud.product.create', compact('productTypes'));
     }
@@ -44,6 +46,12 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
+        if (auth()->user()->cannot('create')){
+            return redirect()->route('profile')->with([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $product = Product::create([
             'name' => $request['name'],
             'description' => $request['description'],
@@ -99,10 +107,16 @@ class ProductController extends Controller
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit(Product $product)
     {
+        if (Auth::user()->cannot('update', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $productTypes = ProductType::all();
         return view('crud.product.edit', compact('product', 'productTypes'));
     }
@@ -112,10 +126,16 @@ class ProductController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  Product  $product
-     * @return \Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     public function update(EditProductRequest $request, Product $product)
     {
+        if (auth()->user()->cannot('update', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $product->update([
             'name' => $request['name'],
             'description' => $request['description'],
@@ -156,6 +176,12 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
+        if (auth()->user()->cannot('destroy', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $images = Image::all()->where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class);
         foreach ($images as $image){
             $image->delete();
@@ -169,12 +195,25 @@ class ProductController extends Controller
 
     public function showImageForm(Product $product)
     {
+        if (auth()->user()->cannot('update', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         return view('crud.product.image', compact('product'));
     }
 
     public function imageDestroy(Image $image)
     {
         $product = Product::where('id', '=' ,$image->imageable_id)->first();
+
+        if (auth()->user()->cannot('update', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
         if($countImages > 1){
             $image->delete();
@@ -189,6 +228,12 @@ class ProductController extends Controller
 
     public function soldProduct(Product $product)
     {
+        if (auth()->user()->cannot('update', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $product->update([
             'status_id' => Status::select('id')->where('name', '=', 'Продан')->first()->id,
         ]);
@@ -200,6 +245,12 @@ class ProductController extends Controller
 
     public function forSaleProduct(Product $product)
     {
+        if (auth()->user()->cannot('forSaleProduct', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $product->update([
             'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
         ]);
@@ -211,6 +262,12 @@ class ProductController extends Controller
 
     public function closeProduct(Product $product)
     {
+        if (auth()->user()->cannot('closeProduct', $product)){
+            return redirect()->route('profile')->withErrors([
+                'error' => 'Доступ закрыт'
+            ]);
+        }
+
         $product->update([
             'status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id,
         ]);

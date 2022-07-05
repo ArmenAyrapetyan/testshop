@@ -18,9 +18,9 @@ class UserRoleSeeder extends Seeder
     {
         $roles = [];
 
-        $nameRole = ['Администратор', 'Пользователь'];
+        $nameRole = ['Администратор', 'Пользователь', 'Заблокирован'];
 
-        for ($i = 0; $i < 2; $i++){
+        for ($i = 0; $i < 3; $i++){
             $roles[] = [
                 'name' => $nameRole[$i],
                 'created_at' => now(),
