@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Notification;
 
 class NotificationController extends Controller
 {
-    public function sendAdminNotification($id, Product $product)
+    public function sendAdminNotification(Product $product)
     {
-        $user = User::where('id', '=', $id)->first();
+        $user = auth()->user();
         $role = UserRole::where('name', '=', 'Администратор')->first();
 
         $notify = [
@@ -30,6 +30,23 @@ class NotificationController extends Controller
 
         return redirect()->route('profile')->with([
             'success' => 'Заявка отправлена',
+        ]);
+    }
+
+    public function deleteNotify($id)
+    {
+        if (auth()->user()->cannot('isAdmin', User::class)){
+            return back()->withErrors([
+                'error' => 'Доступ запрещен'
+            ]);
+        }
+
+        $notification = auth()->user()->role->notifications->where('id', $id);
+
+        $notification->markAsRead();
+
+        return back()->with([
+            'success' => 'Заявка прочитана'
         ]);
     }
 }

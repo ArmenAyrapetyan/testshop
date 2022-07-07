@@ -184,6 +184,8 @@ class ProductController extends Controller
 
         $images = Image::all()->where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class);
         foreach ($images as $image){
+            $path = "public/" . explode('storage/', $image->path)[1];
+            Storage::delete($path);
             $image->delete();
         }
         $product->delete();
@@ -254,6 +256,8 @@ class ProductController extends Controller
         $product->update([
             'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
         ]);
+
+
 
         return redirect()->route('profile')->with([
             'success' => 'Продукт продается вновь',

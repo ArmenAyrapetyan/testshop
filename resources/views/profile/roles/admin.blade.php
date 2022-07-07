@@ -31,7 +31,7 @@
                     </a>
                 </div>
 
-                @foreach(auth()->user()->role->notifications as $notify)
+                @foreach(auth()->user()->role->unreadNotifications as $notify)
                     @foreach($products as $product)
                         @if($product->id == $notify['data']['product_id'])
                             <div class="col-sm-3">
@@ -69,6 +69,15 @@
                                             <button class="btn btn-outline-danger">Удалить</button>
                                         </form>
                                     </li>
+                                    @if ($product->status_id != 4)
+                                        <li class="d-flex justify-content-end align-items-center p-1">
+                                            <form class="m-0" action="{{ route('product.notify.delete', $notify->id) }}"
+                                                  method="post">
+                                                @csrf
+                                                <button class="btn btn-outline-primary">Прочитано</button>
+                                            </form>
+                                        </li>
+                                    @endif
                                 </ul>
                             </div>
                             <hr>

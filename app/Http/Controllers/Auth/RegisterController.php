@@ -41,7 +41,7 @@ class RegisterController extends Controller
 //            'remember_token' => '',
         ]);
 
-
+        $token = $user->createToken('tokens')->plainTextToken;
 
         $image = Image::create([
             'path' => $path,

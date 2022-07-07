@@ -12,10 +12,12 @@
                         <div class="card-body text-center">
                             <img src="{{ asset($userInfo->image->path) }}" alt="avatar"
                                  class="rounded-circle img-fluid" style="width: 150px;">
-                            <h5 class="my-3">{{ $userInfo->last_name . ' ' . $userInfo->first_name }}</h5>
+                            <h5 class="my-3">{{ $userInfo->fio }}</h5>
                             <p class="text-muted mb-1">{{ $userInfo->email }}</p>
                             <p class="text-muted mb-1">{{ $userInfo->phone }}</p>
-                            <p class="text-muted mb-4">{{ $userInfo->role->name }}</p>
+                            <p class="text-muted mb-1">{{ $userInfo->roleU }}</p>
+{{--                            <p class="text-muted mb-1"> Ваш токен: </p>--}}
+{{--                            <p class="text-muted mb-4">{{ auth()->user()->tokens }}</p>--}}
                             <div class="d-flex justify-content-center mb-2">
                                 <a href="{{ route('user.edit', $userInfo) }}">
                                     <button type="button" class="btn btn-primary">Изменить профиль</button>

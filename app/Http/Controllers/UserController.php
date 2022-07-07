@@ -7,6 +7,7 @@ use App\Jobs\BlockUser;
 use App\Models\Image;
 use App\Models\User;
 use App\Models\UserRole;
+use Couchbase\UserManager;
 use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
@@ -83,17 +84,17 @@ class UserController extends Controller
 
         switch ($user->ban_count){
             case 0:
-                BlockUser::dispatch($user)->delay(now()->addSeconds(10));
+                BlockUser::dispatch($user)->delay(now()->addDays(10));
                 $user->ban_count += 1;
                 $user->save();
                 break;
             case 1:
-                BlockUser::dispatch($user)->delay(now()->addSeconds(20));
+                BlockUser::dispatch($user)->delay(now()->addDays(20));
                 $user->ban_count += 1;
                 $user->save();
                 break;
             case 2:
-                BlockUser::dispatch($user)->delay(now()->addSeconds(30));
+                BlockUser::dispatch($user)->delay(now()->addDays(30));
                 $user->ban_count += 1;
                 $user->save();
                 break;

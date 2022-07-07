@@ -44,14 +44,20 @@ Route::prefix('crud')->group(function () {
         //Редактирование
         Route::get('product/edit/{product}', [ProductController::class, 'edit'])->name('edit');
         Route::put('product/update/{product}', [ProductController::class, 'update'])->name('update');
+
         //Удаление
         Route::delete('product/destroy/{product}', [ProductController::class, 'destroy'])->name('destroy');
+
         //Статусы
         Route::get('product/sold/{product}', [ProductController::class, 'soldProduct'])->name('sold');
         Route::get('product/for_sale/{product}', [ProductController::class, 'forSaleProduct'])->name('forsale');
         Route::get('product/close/{product}', [ProductController::class, 'closeProduct'])->name('close');
-        //Уведомления
-        Route::get('notify/{id}/{product}', [NotificationController::class, 'sendAdminNotification'])->name('notify');
+
+        //Создание уведомления
+        Route::get('notify/{product}', [NotificationController::class, 'sendAdminNotification'])->name('notify.create');
+
+        //Удаление уведомления
+        Route::post('notify/{id}', [NotificationController::class, 'deleteNotify'])->name('notify.delete');
 
         //Изображения
         Route::get('product/edit/image/{product}', [ProductController::class, 'showImageForm'])->name('edit.image');
@@ -63,6 +69,7 @@ Route::prefix('crud')->group(function () {
         //Изменение
         Route::get('user/edit/{user}', [UserController::class, 'edit'])->name('edit');
         Route::post('user/update/{user}', [UserController::class, 'update'])->name('update');
+
         //Бан
         Route::get('user/block/{id}', [UserController::class, 'blockUser'])->name('block');
     });
@@ -72,6 +79,7 @@ Route::prefix('crud')->group(function () {
         //Создание комментария
         Route::get('review/create/{id}', [ReviewController::class, 'create'])->name('create');
         Route::post('review/store', [ReviewController::class, 'store'])->name('store');
+
         //Создание жалобы
         Route::get('claim/{id}', [ReviewController::class, 'createClaim'])->name('claimcreate');
         Route::post('claim/claimStore', [ReviewController::class, 'claimStore'])->name('claimstore');
@@ -79,6 +87,7 @@ Route::prefix('crud')->group(function () {
 
     //Типы продуктов
     Route::middleware(['auth', 'verified'])->as('type.')->group(function () {
+        //Создание
         Route::get('type/create', [ProductTypeController::class, 'create'])->name('create');
         Route::post('type/store', [ProductTypeController::class, 'store'])->name('store');
     });
