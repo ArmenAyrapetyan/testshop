@@ -29,7 +29,7 @@ class RegisterRequest extends FormRequest
             'phone' => 'required|min:11|unique:users,phone',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:8|confirmed',
-            'avatar' => 'required|max:10000|mimes:jpg,jpeg,png,bmp,tiff',
+            'images[].*' => 'required|max:10000|mimes:jpg,jpeg,png,bmp,tiff',
         ];
     }
 
@@ -62,8 +62,8 @@ class RegisterRequest extends FormRequest
 
             'password.confirmed' => 'Пароли не совпадают',
 
-            'avatar.max' => 'Максимальный размер изображения 10 мегабит',
-            'avatar.mimes' => 'Разрешеные расшерения:jpg,jpeg,png,bmp,tiff',
+            'images[].max' => 'Максимальный размер изображения 10 мегабит',
+            'images[].mimes' => 'Разрешеные расшерения:jpg,jpeg,png,bmp,tiff',
         ];
     }
 }

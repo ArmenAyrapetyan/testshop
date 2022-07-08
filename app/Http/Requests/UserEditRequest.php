@@ -40,7 +40,7 @@ class UserEditRequest extends FormRequest
             'first_name' => 'фамилия',
             'last_name' => 'имя',
             'phone' => 'номер телефона',
-            'avatar' => 'изображение профиля',
+            'images[]' => 'изображение профиля',
         ];
     }
 
@@ -55,8 +55,8 @@ class UserEditRequest extends FormRequest
             'last_name.max' => 'Вы превысили максимально число символов в поле :attribute, максимум :max',
             'last_name.min' => 'Мало символов в поле :attribute, минимум :min',
 
-            'avatar.max' => 'Максимальный размер изображения 10 мегабит',
-            'avatar.mimes' => 'Разрешеные расшерения:jpg,jpeg,png,bmp,tiff',
+            'images[].max' => 'Максимальный размер изображения 10 мегабит',
+            'images[].mimes' => 'Разрешеные расшерения:jpg,jpeg,png,bmp,tiff',
         ];
     }
 }

@@ -5,13 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
-use App\Models\Image;
 use App\Models\User;
+use App\Services\FileManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Facades\Storage;
 
 class AuthResponceController extends Controller
 {
@@ -33,16 +32,7 @@ class AuthResponceController extends Controller
 
     public function register(RegisterRequest $request)
     {
-        $file = $request->file('avatar');
-
-        $upload_folder = "public/images/" . date('Y-m-d');
-        $name = $file->getClientOriginalName();
-        $name = strstr($name, '.', true);
-        $extension = $file->getClientOriginalExtension();
-        $name = $name . date('Y-m-d') . '.' . $extension;
-        $path = Storage::putFileAs($upload_folder, $file, $name);
-
-        $path = str_replace('public', 'storage', $path);
+        $file = $request->file('images');
 
         $user = User::create([
             'first_name' => $request['first_name'],
@@ -54,18 +44,14 @@ class AuthResponceController extends Controller
 
         $token = $user->createToken('tokens')->plainTextToken;
 
-        $image = Image::create([
-            'path' => $path,
-            'imageable_type' => User::class,
-            'imageable_id' => $user->id,
-        ]);
+        FileManager::saveImage($file, $user->id, "User");
 
         $message = [
             'id' => 0,
             'message' => 'Регистрация провалена',
         ];
 
-        if ($user && $image) {
+        if ($user) {
             $user->sendEmailVerificationNotification();
             $message = [
                 'id' => $user->id,

@@ -7,12 +7,9 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\ProductType;
-use App\Models\Review;
 use App\Models\Status;
-use Illuminate\Http\Request;
+use App\Services\FileManager;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -28,7 +25,7 @@ class ProductController extends Controller
 
     public function create()
     {
-        if (auth()->user()->cannot('create')){
+        if (auth()->user()->cannot('create', Product::class)){
             return redirect()->route('profile')->withErrors([
                'error' => 'Доступ закрыт'
             ]);
@@ -46,8 +43,8 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        if (auth()->user()->cannot('create')){
-            return redirect()->route('profile')->with([
+        if (auth()->user()->cannot('create', Product::class)){
+            return redirect()->route('profile')->withErrors([
                 'error' => 'Доступ закрыт'
             ]);
         }
@@ -63,24 +60,7 @@ class ProductController extends Controller
 
         $files = $request->file('images');
 
-        foreach ($files as $file) {
-            $upload_folder = "public/images/" . date('Y-m-d');
-            $name = $file->getClientOriginalName();
-            $name = strstr($name, '.', true);
-            $extension = $file->getClientOriginalExtension();
-            $name = $name . date('Y-m-d') . '.' . $extension;
-            $path = Storage::putFileAs($upload_folder, $file, $name);
-
-            $path = str_replace('public', 'storage', $path);
-
-            Image::create([
-                'path' => $path,
-                'imageable_type' => Product::class,
-                'imageable_id' => $product->id,
-            ]);
-        }
-
-        if ($product) {
+        if ($product && FileManager::saveImage($files, $product->id, "Product")) {
             return redirect()->route('profile')->with([
                 'success' => 'Продукт созадан',
             ]);
@@ -147,22 +127,7 @@ class ProductController extends Controller
         if ($request->file('images')){
             $files = $request->file('images');
 
-            foreach ($files as $file) {
-                $upload_folder = "public/images/" . date('Y-m-d');
-                $name = $file->getClientOriginalName();
-                $name = strstr($name, '.', true);
-                $extension = $file->getClientOriginalExtension();
-                $name = $name . date('Y-m-d') . '.' . $extension;
-                $path = Storage::putFileAs($upload_folder, $file, $name);
-
-                $path = str_replace('public', 'storage', $path);
-
-                Image::create([
-                    'path' => $path,
-                    'imageable_type' => Product::class,
-                    'imageable_id' => $product->id,
-                ]);
-            }
+            FileManager::saveImage($files, $product->id, "Product");
         }
 
         return redirect(route('profile'))->with('success', 'Продукт изменен');
@@ -176,7 +141,7 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        if (auth()->user()->cannot('destroy', $product)){
+        if (auth()->user()->cannot('delete', $product)){
             return redirect()->route('profile')->withErrors([
                 'error' => 'Доступ закрыт'
             ]);
@@ -184,8 +149,7 @@ class ProductController extends Controller
 
         $images = Image::all()->where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class);
         foreach ($images as $image){
-            $path = "public/" . explode('storage/', $image->path)[1];
-            Storage::delete($path);
+            FileManager::deleteImage($image->path);
             $image->delete();
         }
         $product->delete();
@@ -218,6 +182,7 @@ class ProductController extends Controller
 
         $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
         if($countImages > 1){
+            FileManager::deleteImage($image->path);
             $image->delete();
             return redirect()->back()->with([
                 'success' => 'Изображение удалено',
@@ -276,7 +241,7 @@ class ProductController extends Controller
             'status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id,
         ]);
 
-        return redirect()->route('profile')->with([
+        return back()->with([
             'success' => 'Продукт скрыт',
         ]);
     }

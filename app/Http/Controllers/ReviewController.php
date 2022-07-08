@@ -42,7 +42,7 @@ class ReviewController extends Controller
                 ]);
             }
         }
-        return back()->with([
+        return redirect()->route('product.show', $request['product_id'])->with([
             'success' => 'Комментарий оставлен'
         ]);
     }
@@ -65,11 +65,11 @@ class ReviewController extends Controller
                 'is_claim' => 1,
             ]);
 
-            return back()->with([
+            return redirect()->route('product.show', $request['product_id'])->with([
                 'success' => 'Жалоба отправлена'
             ]);
         }
-        return back()->with([
+        return redirect()->route('product.show', $request['product_id'])->with([
             'success' => 'Вы уже жаловались на этот продукт'
         ]);
     }

@@ -85,7 +85,7 @@
                             @endif
                             @if($product->status_id == 2)
                                 <li class="d-flex justify-content-end align-items-center p-1">
-                                    <a href="{{ route('product.notify', [1, $product]) }}">
+                                    <a href="{{ route('product.notify.create', [$product]) }}">
                                         <button class="btn btn-outline-primary">Исправлен</button>
                                     </a>
                                 </li>

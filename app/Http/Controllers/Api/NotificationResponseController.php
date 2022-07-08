@@ -8,7 +8,6 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\UserRole;
 use App\Notifications\AdminNotificaton;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 
 class NotificationResponseController extends Controller

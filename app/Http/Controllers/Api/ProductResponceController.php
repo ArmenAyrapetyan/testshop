@@ -11,7 +11,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\Image;
 use App\Models\Product;
 use App\Models\Status;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileManager;
 
 class ProductResponceController extends Controller
 {
@@ -46,22 +46,7 @@ class ProductResponceController extends Controller
 
         $files = $request->file('images');
 
-        foreach ($files as $file) {
-            $upload_folder = "public/images/" . date('Y-m-d');
-            $name = $file->getClientOriginalName();
-            $name = strstr($name, '.', true);
-            $extension = $file->getClientOriginalExtension();
-            $name = $name . date('Y-m-d') . '.' . $extension;
-            $path = Storage::putFileAs($upload_folder, $file, $name);
-
-            $path = str_replace('public', 'storage', $path);
-
-            Image::create([
-                'path' => $path,
-                'imageable_type' => Product::class,
-                'imageable_id' => $product->id,
-            ]);
-        }
+        FileManager::saveImage($files, $product->id, "Product");
 
         if ($product) {
             $message = [
@@ -98,22 +83,7 @@ class ProductResponceController extends Controller
         if ($request->file('images')){
             $files = $request->file('images');
 
-            foreach ($files as $file) {
-                $upload_folder = "public/images/" . date('Y-m-d');
-                $name = $file->getClientOriginalName();
-                $name = strstr($name, '.', true);
-                $extension = $file->getClientOriginalExtension();
-                $name = $name . date('Y-m-d') . '.' . $extension;
-                $path = Storage::putFileAs($upload_folder, $file, $name);
-
-                $path = str_replace('public', 'storage', $path);
-
-                Image::create([
-                    'path' => $path,
-                    'imageable_type' => Product::class,
-                    'imageable_id' => $product->id,
-                ]);
-            }
+            FileManager::saveImage($files, $product->id, "Product");
         }
 
         return [
@@ -133,8 +103,7 @@ class ProductResponceController extends Controller
 
         $images = Image::all()->where('imageable_id', $product->id)->where('imageable_type', Product::class);
         foreach ($images as $image){
-            $path = "public/" . explode('storage/', $image->path)[1];
-            Storage::delete($path);
+            FileManager::deleteImage($image->path);
             $image->delete();
         }
 
@@ -158,8 +127,7 @@ class ProductResponceController extends Controller
 
         $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
         if($countImages > 1){
-            $path = "public/" . explode('storage/', $image->path)[1];
-            Storage::delete($path);
+            FileManager::deleteImage($image->path);
             $image->delete();
             return [
                 'message' => 'Изображение удалено',

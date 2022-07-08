@@ -79,13 +79,13 @@
                             </div>
 
                             <div class="row mb-3">
-                                <label for="avatar" class="col-md-4 col-form-label text-md-end">{{ __('Выберите аватар') }}</label>
+                                <label for="images[]" class="col-md-4 col-form-label text-md-end">{{ __('Выберите аватар') }}</label>
 
                                 <div class="col-md-6">
-                                    <input type="file" class="form-control @error('avatar') is-invalid @enderror"
-                                           name="avatar"/>
+                                    <input type="file" class="form-control @error('images[]') is-invalid @enderror"
+                                           name="images[]"/>
 
-                                    @error('avatar')
+                                    @error('images[]')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>

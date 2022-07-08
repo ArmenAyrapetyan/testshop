@@ -7,8 +7,7 @@ use App\Jobs\BlockUser;
 use App\Models\Image;
 use App\Models\User;
 use App\Models\UserRole;
-use Couchbase\UserManager;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileManager;
 
 class UserController extends Controller
 {
@@ -38,31 +37,18 @@ class UserController extends Controller
             'email' => $request['email'],
         ]);
 
-        if ($request->file('avatar')){
+        if ($request->file('images')){
             $oldimgpath = Image::where('imageable_id', '=', $user->id)
                 ->where('imageable_type', '=', User::class)
                 ->first();
 
-//            Storage::delete($oldimgpath->path);
+            FileManager::deleteImage($oldimgpath->path);
 
             $oldimgpath->delete();
 
-            $file = $request->file('avatar');
+            $file = $request->file('images');
 
-            $upload_folder = "public/images/" . date('Y-m-d');
-            $name = $file->getClientOriginalName();
-            $name = strstr($name, '.', true);
-            $extension = $file->getClientOriginalExtension();
-            $name = $name . date('Y-m-d') . '.' . $extension;
-            $path = Storage::putFileAs($upload_folder, $file, $name);
-
-            $path = str_replace('public', 'storage', $path);
-
-            Image::create([
-                'path' => $path,
-                'imageable_type' => User::class,
-                'imageable_id' => $user->id,
-            ]);
+            FileManager::saveImage($file, $user->id, "User");
         }
 
         return redirect()->route('profile')->with([

@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductTypeRequest;
 use App\Models\ProductType;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ProductTypeController extends Controller
 {
