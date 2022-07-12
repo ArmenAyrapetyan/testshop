@@ -51,40 +51,36 @@ class ProductDetalResource extends JsonResource
     public function comments()
     {
         $comments = [];
+
+        foreach ($this->reviews as $com) if (!$com->is_claim){
+
+            $images = $this->imagesCom($com);
+
+            $comment = [
+                'text' => $com->text,
+                'images' => $images,
+            ];
+
+            $comments += [ 'com_' . $com->id => $comment];
+        }
+        return $comments;
+    }
+
+    protected function imagesCom($com)
+    {
         $images = [];
+        foreach ($com->images as $img){
 
-        foreach ($this->reviews as $com){
+            $image = [
+                'id' => $img['id'],
+                'path' => $img['path'],
+            ];
 
-            if (!$com->is_claim){
-
-                foreach ($com->images as $img){
-
-                    $image = [
-                        'id' => $img['id'],
-                        'path' => $img['path'],
-                    ];
-
-                    $images += [
-                      'img_' . $img->id => $image,
-                    ];
-
-                }
-
-                $comment = [
-                    'text' => $com->text,
-                    'images' => $images,
-                ];
-
-                $images = [];
-
-                $comments += [
-                    'com_' . $com->id => $comment,
-                ];
-
-            }
+            $images += [
+                'img_' . $img->id => $image,
+            ];
 
         }
-
-        return $comments;
+        return $images;
     }
 }

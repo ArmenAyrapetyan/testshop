@@ -17,18 +17,15 @@ class VerificationController extends Controller
     {
         $request->user()->sendEmailVerificationNotification();
 
-        return redirect()->route('verification.notice')->with([
-            'resent' => 'Вам отправленно повторное письмо',
-        ]);
+        return redirect()->route('verification.notice')
+            ->with(['resent' => 'Вам отправленно повторное письмо']);
     }
 
     public function verify(EmailVerificationRequest $request)
     {
         $request->fulfill();
 
-        return redirect()->route('home')->with([
-           'success' => 'Почта подтверждена',
-        ]);
+        return redirect()->route('home')->with(['success' => 'Почта подтверждена']);
     }
 
     public function show()

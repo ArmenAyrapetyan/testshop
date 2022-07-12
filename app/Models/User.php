@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\FileManager;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -74,5 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function role()
     {
         return $this->belongsTo(UserRole::class, 'role_id', 'id');
+    }
+
+    public function changeImg($newImg, $user)
+    {
+        $oldImg = $user->image;
+        FileManager::deleteImage($oldImg->path);
+        $oldImg->delete();
+
+        FileManager::saveImage($newImg, $user->id, User::class);
     }
 }

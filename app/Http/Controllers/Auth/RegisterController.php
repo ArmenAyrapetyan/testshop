@@ -25,12 +25,9 @@ class RegisterController extends Controller
             'password' => Hash::make($request['password']),
         ]);
 
-        $token = $user->createToken('tokens')->plainTextToken;
-
         $files = $request->file('images');
-        $type = "User";
 
-        if ($user && FileManager::saveImage($files, $user->id, $type)) {
+        if ($user && FileManager::saveImage($files, $user->id, User::class)) {
             auth()->login($user);
             $user->sendEmailVerificationNotification();
             return redirect()->route('verification.notice');

@@ -21,9 +21,8 @@ class LoginController extends Controller
             return redirect()->route('home');
         }
 
-        return redirect()->route('login')->withErrors([
-            'email' => 'Ошибка авторизации. Логин или паоль введены неверно',
-        ]);
+        return redirect()->route('login')
+            ->withErrors(['email' => 'Ошибка авторизации. Логин или паоль введены неверно']);
     }
 
     public function logout()

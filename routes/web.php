@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
 Auth::routes(['verify' => true]);
 
 //Главная страница
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', [ProductController::class, 'index'])->name('home');
 
 //Профиль verified
 Route::get('/profile', [ProfileController::class, 'showProfileview'])->middleware(['auth', 'verified'])->name('profile');

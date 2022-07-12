@@ -9,27 +9,25 @@ use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Status;
 use App\Services\FileManager;
-use Illuminate\Support\Facades\Auth;
+use App\Services\ProductPolicyService;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
     {
-        //
+        $products = Product::all();
+
+        return view('home', compact('products'));
     }
 
     public function create()
     {
-        if (auth()->user()->cannot('create', Product::class)){
-            return redirect()->route('profile')->withErrors([
-               'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canCreate()) return ProductPolicyService::toProfile();
 
         $productTypes = ProductType::all();
         return view('crud.product.create', compact('productTypes'));
@@ -43,32 +41,20 @@ class ProductController extends Controller
      */
     public function store(ProductRequest $request)
     {
-        if (auth()->user()->cannot('create', Product::class)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canCreate()) return ProductPolicyService::toProfile();
 
-        $product = Product::create([
-            'name' => $request['name'],
-            'description' => $request['description'],
-            'price' => $request['price'],
+        $request->request->add([
             'user_id' => $request->user()->id,
             'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
-            'product_type_id' => $request['product_type_id'],
         ]);
 
-        $files = $request->file('images');
+        $product = Product::create($request->all());
 
-        if ($product && FileManager::saveImage($files, $product->id, "Product")) {
-            return redirect()->route('profile')->with([
-                'success' => 'Продукт созадан',
-            ]);
-        }
+        if ($product && FileManager::saveImage($request->file('images'), $product->id, Product::class))
+            return redirect()->route('profile')->with(['success' => 'Продукт созадан']);
 
-        return redirect()->route('product.create')->withErrors([
-            'error' => 'Ошибка создания продукта, попробуйте позже',
-        ]);
+        return redirect()->route('product.create')
+            ->withErrors(['error' => 'Ошибка создания продукта, попробуйте позже']);
     }
 
     /**
@@ -91,11 +77,7 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        if (Auth::user()->cannot('update', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile();
 
         $productTypes = ProductType::all();
         return view('crud.product.edit', compact('product', 'productTypes'));
@@ -110,24 +92,18 @@ class ProductController extends Controller
      */
     public function update(EditProductRequest $request, Product $product)
     {
-        if (auth()->user()->cannot('update', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile();
 
-        $product->update([
-            'name' => $request['name'],
-            'description' => $request['description'],
-            'price' => $request['price'],
+        $request->request->add([
             'user_id' => $request->user()->id,
-            'product_type_id' => $request['product_type_id'],
         ]);
+
+        $product->update($request->all());
 
         if ($request->file('images')){
             $files = $request->file('images');
 
-            FileManager::saveImage($files, $product->id, "Product");
+            FileManager::saveImage($files, $product->id, Product::class);
         }
 
         return redirect(route('profile'))->with('success', 'Продукт изменен');
@@ -141,31 +117,18 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        if (auth()->user()->cannot('delete', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile();
 
-        $images = Image::all()->where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class);
-        foreach ($images as $image){
-            FileManager::deleteImage($image->path);
-            $image->delete();
-        }
+        Image::deleteImages($product->id, Product::class);
+
         $product->delete();
 
-        return redirect()->route('profile')->with([
-            'success' => 'Продукт удален',
-        ]);
+        return redirect()->route('profile')->with(['success' => 'Продукт удален']);
     }
 
     public function showImageForm(Product $product)
     {
-        if (auth()->user()->cannot('update', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile();
 
         return view('crud.product.image', compact('product'));
     }
@@ -174,75 +137,43 @@ class ProductController extends Controller
     {
         $product = Product::where('id', '=' ,$image->imageable_id)->first();
 
-        if (auth()->user()->cannot('update', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile();
 
-        $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
+        $countImages = Image::where('imageable_id', '=', $product->id)
+            ->where('imageable_type', '=', Product::class)->count();
+
         if($countImages > 1){
             FileManager::deleteImage($image->path);
             $image->delete();
-            return redirect()->back()->with([
-                'success' => 'Изображение удалено',
-            ]);
+            return redirect()->back()->with(['success' => 'Изображение удалено']);
         }
-        return redirect()->back()->withErrors([
-           'error' => 'У продукта должно быть хотя бы 1 изображение',
-        ]);
+        return redirect()->back()->withErrors(['error' => 'У продукта должно быть хотя бы 1 изображение']);
     }
 
     public function soldProduct(Product $product)
     {
-        if (auth()->user()->cannot('update', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile();
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Продан')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::STATUS_SOLD]);
 
-        return redirect()->route('profile')->with([
-            'success' => 'Продукт отмечен проданым',
-        ]);
+        return redirect()->route('profile')->with(['success' => 'Продукт отмечен проданым']);
     }
 
     public function forSaleProduct(Product $product)
     {
-        if (auth()->user()->cannot('forSaleProduct', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile();
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::STATUS_SALE]);
 
-
-
-        return redirect()->route('profile')->with([
-            'success' => 'Продукт продается вновь',
-        ]);
+        return redirect()->route('profile')->with(['success' => 'Продукт продается вновь']);
     }
 
     public function closeProduct(Product $product)
     {
-        if (auth()->user()->cannot('closeProduct', $product)){
-            return redirect()->route('profile')->withErrors([
-                'error' => 'Доступ закрыт'
-            ]);
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile();
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::STATUS_HIDDEN]);
 
-        return back()->with([
-            'success' => 'Продукт скрыт',
-        ]);
+        return back()->with(['success' => 'Продукт скрыт']);
     }
 }

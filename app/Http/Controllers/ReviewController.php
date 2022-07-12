@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ReviewRequest;
-use App\Models\Image;
 use App\Models\Review;
-use Illuminate\Support\Facades\Storage;
+use App\Services\FileManager;
 
 class ReviewController extends Controller
 {
@@ -16,32 +15,15 @@ class ReviewController extends Controller
 
     public function store(ReviewRequest $request)
     {
-        $review = Review::create([
-            'text' => $request['text'],
+        $request->request->add([
             'user_id' => $request->user()->id,
-            'product_id' => $request['product_id'],
         ]);
 
-        if ($request->hasFile('images')) {
-            $files = $request->file('images');
+        $review = Review::create($request->all());
 
-            foreach ($files as $file) {
-                $upload_folder = "public/images/" . date('Y-m-d');
-                $name = $file->getClientOriginalName();
-                $name = strstr($name, '.', true);
-                $extension = $file->getClientOriginalExtension();
-                $name = $name . date('Y-m-d') . '.' . $extension;
-                $path = Storage::putFileAs($upload_folder, $file, $name);
+        if ($request->hasFile('images'))
+            FileManager::saveImage($request->file('images'), $review->id, Review::class);
 
-                $path = str_replace('public', 'storage', $path);
-
-                Image::create([
-                    'path' => $path,
-                    'imageable_type' => Review::class,
-                    'imageable_id' => $review->id,
-                ]);
-            }
-        }
         return redirect()->route('product.show', $request['product_id'])->with([
             'success' => 'Комментарий оставлен'
         ]);
@@ -54,23 +36,23 @@ class ReviewController extends Controller
 
     public function claimStore(ReviewRequest $request)
     {
-        if (Review::where('user_id', '=', $request->user()->id)
-                ->where('product_id', '=', $request['product_id'])
-                ->where('is_claim', '=', '1')
-                ->count() == 0) {
-            Review::create([
-                'text' => $request['text'],
+        if (!Review::where('user_id', $request->user()->id)
+                ->where('product_id', $request['product_id'])
+                ->where('is_claim', '1')
+                ->count()) {
+
+            $request->request->add([
                 'user_id' => $request->user()->id,
-                'product_id' => $request['product_id'],
                 'is_claim' => 1,
             ]);
 
-            return redirect()->route('product.show', $request['product_id'])->with([
-                'success' => 'Жалоба отправлена'
-            ]);
+            Review::create($request->all());
+
+            return redirect()->route('product.show', $request['product_id'])
+                ->with(['success' => 'Жалоба отправлена']);
         }
-        return redirect()->route('product.show', $request['product_id'])->with([
-            'success' => 'Вы уже жаловались на этот продукт'
-        ]);
+
+        return redirect()->route('product.show', $request['product_id'])
+            ->with(['success' => 'Вы уже жаловались на этот продукт']);
     }
 }

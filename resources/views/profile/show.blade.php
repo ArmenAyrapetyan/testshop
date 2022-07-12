@@ -16,8 +16,6 @@
                             <p class="text-muted mb-1">{{ $userInfo->email }}</p>
                             <p class="text-muted mb-1">{{ $userInfo->phone }}</p>
                             <p class="text-muted mb-1">{{ $userInfo->roleU }}</p>
-{{--                            <p class="text-muted mb-1"> Ваш токен: </p>--}}
-{{--                            <p class="text-muted mb-4">{{ auth()->user()->tokens }}</p>--}}
                             <div class="d-flex justify-content-center mb-2">
                                 <a href="{{ route('user.edit', $userInfo) }}">
                                     <button type="button" class="btn btn-primary">Изменить профиль</button>

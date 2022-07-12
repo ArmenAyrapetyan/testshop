@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\Image;
-use App\Models\Product;
-use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 class FileManager
@@ -17,27 +15,17 @@ class FileManager
             $name = $file->getClientOriginalName();
             $name = strstr($name, '.', true);
             $extension = $file->getClientOriginalExtension();
-            $name = $name . date('Y-m-d') . '.' . $extension;
+            $name = $name . date('Y-m-d-H-i-s') . '.' . $extension;
             $path = Storage::putFileAs($upload_folder, $file, $name);
 
             $path = str_replace('public', 'storage', $path);
 
-            if ($type == "Product") {
-                Image::create([
-                    'path' => $path,
-                    'imageable_type' => Product::class,
-                    'imageable_id' => $id,
-                ]);
-                $isSaved = true;
-            }
-            if ($type == "User") {
-                Image::create([
-                    'path' => $path,
-                    'imageable_type' => User::class,
-                    'imageable_id' => $id,
-                ]);
-                $isSaved = true;
-            }
+            Image::create([
+                'path' => $path,
+                'imageable_type' => $type,
+                'imageable_id' => $id,
+            ]);
+            $isSaved = true;
         }
         return $isSaved;
     }

@@ -92,12 +92,7 @@ class ProductPolicy
         return $user->id === $product->user_id;
     }
 
-    public function forSaleProduct(User $user, Product $product)
-    {
-        return $user->id === $product->user_id || $user->role_id === 1;
-    }
-
-    public function closeProduct(User $user, Product $product)
+    public function closeDeleteAndSale(User $user, Product $product)
     {
         return $user->id === $product->user_id || $user->role_id === 1;
     }

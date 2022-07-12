@@ -35,7 +35,7 @@ class BlockUser implements ShouldQueue
     {
         $user = $this->user;
 
-        $user->role_id = UserRole::firstWhere('name', 'Пользователь')->id;
+        $user->role_id = UserRole::USER_CLIENT;
         $user->save();
     }
 }

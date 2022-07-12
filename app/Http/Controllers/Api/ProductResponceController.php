@@ -12,6 +12,7 @@ use App\Models\Image;
 use App\Models\Product;
 use App\Models\Status;
 use App\Services\FileManager;
+use App\Services\ProductPolicyService;
 
 class ProductResponceController extends Controller
 {
@@ -27,28 +28,18 @@ class ProductResponceController extends Controller
 
     public function createProduct(ProductRequest $request)
     {
-        $message = [
-            'message' => 'Ошибка создания продукта',
-        ];
+        $message = ['message' => 'Ошибка создания продукта'];
 
-        if ($request->user()->cannot('create', Product::class)){
-            return $message;
-        }
+        if(ProductPolicyService::canCreate()) return ProductPolicyService::toProfile(true);
 
-        $product = Product::create([
-            'name' => $request['name'],
-            'description' => $request['description'],
-            'price' => $request['price'],
+        $request->request->add([
             'user_id' => $request->user()->id,
             'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
-            'product_type_id' => $request['product_type_id'],
         ]);
 
-        $files = $request->file('images');
+        $product = Product::create($request->all());
 
-        FileManager::saveImage($files, $product->id, "Product");
-
-        if ($product) {
+        if ($product && FileManager::saveImage($request->file('images'), $product->id, Product::class)) {
             $message = [
                 'message' => 'Продукт создан',
                 'product' => new ProductResource($product),
@@ -60,138 +51,83 @@ class ProductResponceController extends Controller
 
     public function editProduct(EditProductRequest $request)
     {
-        $request->validate([
-            'id' => 'required'
-        ]);
+        $request->validate(['id' => 'required']);
 
         $product = Product::find($request['id']);
 
-        if ($request->user()->cannot('update', $product)){
-            return [
-                'message' => 'У вас нет доступа к этому продукту'
-            ];
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile(true);
 
-        $product->update([
-            'name' => $request['name'],
-            'description' => $request['description'],
-            'price' => $request['price'],
-            'user_id' => $request->user()->id,
-            'product_type_id' => $request['product_type_id'],
-        ]);
+        $request->request->add(['user_id' => $request->user()->id,]);
 
-        if ($request->file('images')){
-            $files = $request->file('images');
+        $product->update($request->all());
 
-            FileManager::saveImage($files, $product->id, "Product");
-        }
+        if ($request->file('images'))
+            FileManager::saveImage($request->file('images'), $product->id, "Product");
 
-        return [
-            'message' => 'Продукт отредактирован'
-        ];
+        return ['message' => 'Продукт отредактирован'];
     }
 
     public function deleteProduct($id)
     {
         $product = Product::find($id);
 
-        if (auth('sanctum')->user()->cannot('delete', $product)){
-            return [
-              'message' => 'У вас нет доступа к этому продукту',
-            ];
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile(true);
 
-        $images = Image::all()->where('imageable_id', $product->id)->where('imageable_type', Product::class);
-        foreach ($images as $image){
-            FileManager::deleteImage($image->path);
-            $image->delete();
-        }
+        Image::deleteImages($product->id, Product::class);
 
         $product->delete();
 
-        return [
-          'message' => 'Продукт удален',
-        ];
+        return ['message' => 'Продукт удален'];
     }
 
     public function deleteProductImage($id)
     {
         $image = Image::where('id', $id)->where('imageable_type', Product::class)->first();
-        $product = Product::where('id', '=' ,$image->imageable_id)->first();
+        $product = Product::find($image->imageable_id);
 
-        if (auth('sanctum')->user()->cannot('update', $product)){
-            return [
-                'message' => 'Доступ закрыт'
-            ];
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile(true);
 
-        $countImages = Image::where('imageable_id', '=', $product->id)->where('imageable_type', '=', Product::class)->count();
-        if($countImages > 1){
+        $countImages = Image::Images($product->id, Product::class)->count();
+
+        if ($countImages > 1) {
             FileManager::deleteImage($image->path);
             $image->delete();
-            return [
-                'message' => 'Изображение удалено',
-            ];
+            return ['message' => 'Изображение удалено',];
         }
-        return [
-            'message' => 'У продукта должно быть хотя бы 1 изображение',
-        ];
+
+        return ['message' => 'У продукта должно быть хотя бы 1 изображение'];
     }
 
     public function soldProduct($id)
     {
         $product = Product::find($id);
 
-        if (auth('sanctum')->user()->cannot('update', $product)){
-            return [
-                'message' => 'Доступ закрыт'
-            ];
-        }
+        if(ProductPolicyService::canUpdate($product)) return ProductPolicyService::toProfile(true);
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Продан')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::STATUS_SOLD]);
 
-        return [
-            'message' => 'Продукт отмечен проданым',
-        ];
+        return ['message' => 'Продукт отмечен проданым'];
     }
 
     public function forSaleProduct($id)
     {
         $product = Product::find($id);
 
-        if (auth('sanctum')->user()->cannot('forSaleProduct', $product)){
-            return [
-                'message' => 'Доступ закрыт'
-            ];
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile(true);
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::select('id')->where('name', '=', 'Продается')->first()->id,]);
 
-        return [
-            'message' => 'Продукт продается вновь',
-        ];
+        return ['message' => 'Продукт продается вновь'];
     }
 
     public function closeProduct($id)
     {
         $product = Product::find($id);
 
-        if (auth('sanctum')->user()->cannot('closeProduct', $product)){
-            return [
-                'message' => 'Доступ закрыт'
-            ];
-        }
+        if(ProductPolicyService::canCloseDeleteAndSale($product)) return ProductPolicyService::toProfile(true);
 
-        $product->update([
-            'status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id,
-        ]);
+        $product->update(['status_id' => Status::select('id')->where('name', '=', 'Скрыт')->first()->id]);
 
-        return [
-            'message' => 'Продукт скрыт',
-        ];
+        return ['message' => 'Продукт скрыт'];
     }
 }

@@ -16,9 +16,7 @@ class AuthResponceController extends Controller
 {
     public function enter(LoginRequest $request)
     {
-        $message = [
-          'message' => 'Ошибка авторизации не верный логин или пароль',
-        ];
+        $message = ['message' => 'Ошибка авторизации не верный логин или пароль'];
 
         if(Auth::guard()->attempt($request->only(['email', 'password']))){
             $message = [
@@ -44,12 +42,9 @@ class AuthResponceController extends Controller
 
         $token = $user->createToken('tokens')->plainTextToken;
 
-        FileManager::saveImage($file, $user->id, "User");
+        FileManager::saveImage($file, $user->id, User::class);
 
-        $message = [
-            'id' => 0,
-            'message' => 'Регистрация провалена',
-        ];
+        $message = ['message' => 'Регистрация провалена'];
 
         if ($user) {
             $user->sendEmailVerificationNotification();
@@ -66,34 +61,24 @@ class AuthResponceController extends Controller
 
     public function verify(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email'
-        ]);
+        $request->validate(['email' => 'required|email']);
 
         $user = User::firstWhere('email', $request['email']);
 
         $user->sendEmailVerificationNotification();
 
-        $message = [
-            'message' => 'Вам отправленно письмо верификации'
-        ];
+        $message = ['message' => 'Вам отправленно письмо верификации'];
 
         return $message;
     }
 
     public function reset(Request $request)
     {
-        $request->validate([
-            'email' => 'required'
-        ]);
+        $request->validate(['email' => 'required']);
 
-        Password::sendResetLink(
-            $request->only('email')
-        );
+        Password::sendResetLink($request->only('email'));
 
-        $message = [
-            'message' => 'Вам отправленно письмо восстановления пароля'
-        ];
+        $message = ['message' => 'Вам отправленно письмо восстановления пароля'];
 
         return $message;
     }
@@ -102,9 +87,7 @@ class AuthResponceController extends Controller
     {
         auth()->logout();
 
-        $message = [
-            'message' => 'Вы вышли из учетной записи'
-        ];
+        $message = ['message' => 'Вы вышли из учетной записи'];
 
         return $message;
     }

@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Models\UserRole;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
@@ -26,6 +27,6 @@ class UserPolicy
 
     public function isAdmin(User $user)
     {
-        return $user->role_id === 1;
+        return $user->role_id === UserRole::USER_ADMIN;
     }
 }
